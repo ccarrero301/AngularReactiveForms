@@ -26,6 +26,7 @@ function emailMatcher(c: AbstractControl): { [key: string]: boolean } | null {
     return null;
   }
 
+  console.log('does not match');
   return { 'match': true };
 }
 
@@ -39,8 +40,20 @@ export class CustomerComponent implements OnInit {
   customerForm: FormGroup;
   customer = new Customer();
 
+  firstNameMessage = '';
+  firstNameValidationMessages: any = {
+    required: 'Please enter your first name.',
+    minlength: 'The first name must be longer than 3 characters.'
+  };
+
+  lastNameMessage = '';
+  lastNameValidationMessages: any = {
+    required: 'Please enter your last name.',
+    maxlength: 'The last name must be less than 50 characters.'
+  };
+
   emailMessage = '';
-  private emailValidationMessages: any = {
+  emailValidationMessages: any = {
     required: 'Please enter your email address.',
     email: 'Please enter a valid email address.'
   };
@@ -48,7 +61,6 @@ export class CustomerComponent implements OnInit {
   constructor(private formBuilder: FormBuilder) { }
 
   ngOnInit() {
-
     this.customerForm = this.formBuilder.group({
       firstName: ['', [Validators.required, Validators.minLength(3)]],
       lastName: ['', [Validators.required, Validators.maxLength(50)]],
@@ -65,6 +77,14 @@ export class CustomerComponent implements OnInit {
     this.customerForm.get('notification').valueChanges.subscribe(value =>
       this.setNotification(value)
     );
+
+    const firstNameControl = this.customerForm.get('firstName');
+    firstNameControl.valueChanges.subscribe(
+      value => this.firstNameMessage = this.setMessage(firstNameControl, this.firstNameValidationMessages));
+
+    const lastNameControl = this.customerForm.get('lastName');
+    lastNameControl.valueChanges.subscribe(
+      value => this.lastNameMessage = this.setMessage(lastNameControl, this.lastNameValidationMessages));
 
     const emailControl = this.customerForm.get('emailGroup.email');
     emailControl.valueChanges.pipe(
