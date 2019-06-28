@@ -189,8 +189,9 @@
       </div>
 
       <div *ngIf="customerForm.get('sendCatalog').value">
-        <div formArrayName="addresses">
-          <div formGroupName="0">
+        <div formArrayName="addresses"
+             *ngFor="let address of addresses.controls; let i=index">
+          <div [formGroupName]="i">
             <div class="form-group row mb-2">
               <label class="col-md-2 col-form-label pt-0">Address Type</label>
               <div class="col-md-8">
@@ -198,7 +199,7 @@
                   <label class="form-check-label">
                     <input
                       class="form-check-input"
-                      id="addressType1Id"
+                      id="{{ 'addressType1Id' + i }}"
                       type="radio"
                       value="home"
                       formControlName="addressType"
@@ -210,7 +211,7 @@
                   <label class="form-check-label">
                     <input
                       class="form-check-input"
-                      id="addressType1Id"
+                      id="{{ 'addressType1Id' + i }}"
                       type="radio"
                       value="work"
                       formControlName="addressType"
@@ -222,7 +223,7 @@
                   <label class="form-check-label">
                     <input
                       class="form-check-input"
-                      id="addressType1Id"
+                      id="{{ 'addressType1Id' + i }}"
                       type="radio"
                       value="other"
                       formControlName="addressType"
@@ -234,13 +235,13 @@
             </div>
 
             <div class="form-group row mb-2">
-              <label class="col-md-2 col-form-label" for="street1Id"
+              <label class="col-md-2 col-form-label" attr.for="{{ 'street1Id' + i }}"
                 >Street Address 1</label
               >
               <div class="col-md-8">
                 <input
                   class="form-control"
-                  id="street1Id"
+                  id="{{ 'street1Id' + i }}"
                   type="text"
                   placeholder="Street address"
                   formControlName="street1"
@@ -249,13 +250,13 @@
             </div>
 
             <div class="form-group row mb-2">
-              <label class="col-md-2 col-form-label" for="street2Id"
+              <label class="col-md-2 col-form-label" attr.for="{{ 'street2Id' + i }}"
                 >Street Address 2</label
               >
               <div class="col-md-8">
                 <input
                   class="form-control"
-                  id="street2Id"
+                  id="{{ 'street2Id' + i }}"
                   type="text"
                   placeholder="Street address (second line)"
                   formControlName="street2"
@@ -264,13 +265,13 @@
             </div>
 
             <div class="form-group row mb-2">
-              <label class="col-md-2 col-form-label" for="cityId"
+              <label class="col-md-2 col-form-label" attr.for="{{ 'cityId' + i }}"
                 >City, State, Zip Code</label
               >
               <div class="col-md-3">
                 <input
                   class="form-control"
-                  id="cityId"
+                  id="{{ 'cityId' + i }}"
                   type="text"
                   placeholder="City"
                   formControlName="city"
@@ -279,7 +280,7 @@
               <div class="col-md-3">
                 <select
                   class="form-control"
-                  id="stateId"
+                  id="{{ 'stateId' + i }}"
                   formControlName="state"
                 >
                   <option value="" disabled selected hidden
@@ -298,7 +299,7 @@
               <div class="col-md-2">
                 <input
                   class="form-control"
-                  id="zipId"
+                  id="{{ 'zipId' + i }}"
                   type="number"
                   placeholder="Zip Code"
                   formControlName="zip"
@@ -307,6 +308,18 @@
             </div>
           </div>
         </div>
+
+        <div class="form-group row mb-2">
+            <div class="col-md-4">
+              <button class="btn btn-outline-primary"
+                      type="button"
+                      [disabled]="!addresses.valid"
+                      (click)="addAddress()">
+                      Add Another Address
+              </button>
+            </div>
+        </div>
+
       </div>
 
       <div class="form-group row mb-2">
@@ -339,3 +352,5 @@
 <br />Dirty: {{ customerForm.dirty }} <br />Touched: {{ customerForm.touched }}
 <br />Valid: {{ customerForm.valid }} <br />Value:
 {{ customerForm.value | json }}
+<br>Street: {{ addresses.get('0.street1')?.value }}
+<br>&nbsp;

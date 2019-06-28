@@ -98,7 +98,11 @@ export class CustomerComponent implements OnInit {
       value => this.emailMessage = this.setMessage(emailControl, this.emailValidationMessages));
   }
 
-  buildAddress() : FormGroup {
+  addAddress(): void {
+    this.addresses.push(this.buildAddress());
+  }
+
+  buildAddress(): FormGroup {
     return this.formBuilder.group({
       addressType: 'home',
       street1: '',
