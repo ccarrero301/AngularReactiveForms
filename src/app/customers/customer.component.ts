@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, AbstractControl, ValidatorFn } from '@angular/forms';
 
+import { debounceTime } from 'rxjs/operators';
+
 import { Customer } from './customer';
 
 function ratingRange(min: number, max: number): ValidatorFn {
@@ -37,10 +39,10 @@ export class CustomerComponent implements OnInit {
   customerForm: FormGroup;
   customer = new Customer();
 
-  emailMessage: string;
-  private validationMessages = {
+  emailMessage = '';
+  private emailValidationMessages: any = {
     required: 'Please enter your email address.',
-    email: 'Please enter a valid email adress'
+    email: 'Please enter a valid email address.'
   };
 
   constructor(private formBuilder: FormBuilder) { }
@@ -62,31 +64,24 @@ export class CustomerComponent implements OnInit {
 
     this.customerForm.get('notification').valueChanges.subscribe(value =>
       this.setNotification(value)
-      );
+    );
 
-      const emailControl = this.customerForm.get('emailGroup.email');
-      emailControl.valueChanges.subscribe(value =>
-        this.setMessage(emailControl)
-      );
+    const emailControl = this.customerForm.get('emailGroup.email');
+    emailControl.valueChanges.pipe(
+      debounceTime(1000)
+    ).subscribe(
+      value => this.emailMessage = this.setMessage(emailControl, this.emailValidationMessages));
   }
 
-  setMessage(c: AbstractControl): void {
-    this.emailMessage = '';
-    if ((c.touched || c.dirty) && c.errors) {
-      this.emailMessage = Object.keys(c.errors).map(
-        key => this.emailMessage += this.validationMessages[key]).join(' ');
+  setMessage(control: AbstractControl, validationMessages: any): string {
+    let outputErrorMessage = '';
+
+    if ((control.touched || control.dirty) && control.errors) {
+      outputErrorMessage = Object.keys(control.errors).map(
+        key => outputErrorMessage += validationMessages[key]).join(' ');
+
+      return outputErrorMessage;
     }
-  }
-
-  populateTestData(): void {
-    this.customerForm.setValue({
-      firstName: 'Jack',
-      lastName: 'Harkness',
-      email: 'jack@torchwood.com',
-      phone: '',
-      notification: 'email',
-      sendCatalog: false
-    });
   }
 
   save() {
@@ -104,5 +99,16 @@ export class CustomerComponent implements OnInit {
     }
 
     phoneControl.updateValueAndValidity();
+  }
+
+  populateTestData(): void {
+    this.customerForm.setValue({
+      firstName: 'Jack',
+      lastName: 'Harkness',
+      email: 'jack@torchwood.com',
+      phone: '',
+      notification: 'email',
+      sendCatalog: false
+    });
   }
 }
