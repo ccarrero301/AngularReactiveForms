@@ -37,6 +37,12 @@ export class CustomerComponent implements OnInit {
   customerForm: FormGroup;
   customer = new Customer();
 
+  emailMessage: string;
+  private validationMessages = {
+    required: 'Please enter your email address.',
+    email: 'Please enter a valid email adress'
+  };
+
   constructor(private formBuilder: FormBuilder) { }
 
   ngOnInit() {
@@ -57,6 +63,19 @@ export class CustomerComponent implements OnInit {
     this.customerForm.get('notification').valueChanges.subscribe(value =>
       this.setNotification(value)
       );
+
+      const emailControl = this.customerForm.get('emailGroup.email');
+      emailControl.valueChanges.subscribe(value =>
+        this.setMessage(emailControl)
+      );
+  }
+
+  setMessage(c: AbstractControl): void {
+    this.emailMessage = '';
+    if ((c.touched || c.dirty) && c.errors) {
+      this.emailMessage = Object.keys(c.errors).map(
+        key => this.emailMessage += this.validationMessages[key]).join(' ');
+    }
   }
 
   populateTestData(): void {
